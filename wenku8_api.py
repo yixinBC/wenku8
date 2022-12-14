@@ -8,8 +8,9 @@ the api for https://www.wenku8.net
 import requests
 from requests.cookies import RequestsCookieJar
 from lxml import etree
+from bs4 import BeautifulSoup
 
-FAKE_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0"}
+FAKE_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"}
 
 
 def _login(username: str, password: str, usecookie: int) -> RequestsCookieJar:
@@ -39,8 +40,11 @@ class Wenku8api:
     """
 
     class User:
+        """
+        user class
+        """
+
         def __init__(self, user_id: str, name: str, level: str, honor: str, points: int, avatar_url: str) -> None:
-            print(user_id, name, level, honor, points, avatar_url)
             self.id = user_id
             self.name = name
             self.level = level
@@ -49,6 +53,10 @@ class Wenku8api:
             self.avatar_url = avatar_url
 
     class Book:
+        """
+        book class
+        """
+
         def __init__(self, book_id: str, user_cookies: RequestsCookieJar) -> None:
             self.book_id = book_id
             self.book_url = f"https://www.wenku8.net/book/{book_id}.htm"
@@ -67,15 +75,15 @@ class Wenku8api:
         get user info
         :return: User
         """
-        user_info = etree.HTML(
-            requests.get("https://www.wenku8.net/userdetail.php", cookies=self.cookies, headers=FAKE_HEADERS).text)
+        user_info = BeautifulSoup(requests.get("https://www.wenku8.net/userdetail.php",
+                                               cookies=self.cookies, headers=FAKE_HEADERS).content, "lxml")
         return self.User(
-            user_id=user_info.xpath('//*[@id="content"]/table/tbody/tr[1]/td[2]/text()'),
-            name=user_info.xpath('//*[@id="content"]/table/tbody/tr[3]/td[2]/text()'),
-            level=user_info.xpath('//*[@id="content"]/table/tbody/tr[5]/td[2]/text()'),
-            honor=user_info.xpath('//*[@id="content"]/table/tbody/tr[6]/td[2]/text()'),
-            points=int(user_info.xpath('//*[@id="content"]/table/tbody/tr[16]/td[2]/text()')),
-            avatar_url=user_info.xpath('//*[@id="content"]/table/tbody/tr[1]/td[3]/img/attribute::src')
+            user_id=user_info.select("#content  table")[0].contents[3].contents[3].text,
+            name=user_info.select("#content  table")[0].contents[7].contents[3].text,
+            level=user_info.select("#content  table")[0].contents[11].contents[3].text,
+            honor=user_info.select("#content  table")[0].contents[13].contents[3].text,
+            points=int(user_info.select("#content  table")[0].contents[33].contents[3].text),
+            avatar_url=user_info.select("#content  table")[0].contents[3].contents[5].img["src"]
         )
 
     def get_book(self, book_id) -> Book:
