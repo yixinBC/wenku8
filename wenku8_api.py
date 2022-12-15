@@ -61,11 +61,15 @@ class Wenku8api:
             self.book_id = book_id
             self.book_url = f"https://www.wenku8.net/book/{book_id}.htm"
             self.user_cookies = user_cookies
-            self.meta_info = etree.HTML(
-                requests.get(self.book_url, cookies=self.user_cookies, headers=FAKE_HEADERS).text)
-            self.cover_url = self.meta_info.xpath(
-                '//*[@id="content"]/div[1]/table[2]/tbody/tr/td[1]/img/attribute::src')
-            self.author = self.meta_info.xpath('//*[@id="content"]/div[1]/table[1]/tbody/tr[2]/td[2]/text()')
+            self.meta_info = BeautifulSoup(
+                requests.get(self.book_url, cookies=self.user_cookies, headers=FAKE_HEADERS).content, "lxml")
+            self.name = self.meta_info.select("#content > div:nth-child(1) > table:nth-child(1) > tr:nth-child(1) > "
+                                              "td:nth-child(1) > table:nth-child(1) > tr:nth-child(1) > td:nth-child("
+                                              "1) > span:nth-child(1) > b:nth-child(1)")[0].text
+            self.cover_url = self.meta_info.select("#content > div:nth-child(1) > table:nth-child(4) > "
+                                                   "tr:nth-child(1) > td:nth-child(1) > img:nth-child(1)")[0]["src"]
+            self.author = self.meta_info.select("#content > div:nth-child(1) > table:nth-child(1) > tr:nth-child(2) > "
+                                                "td:nth-child(2)")[0].text[5:]
 
     def __init__(self, username: str, password: str, usecookie: int):
         self.cookies = _login(username, password, usecookie)
