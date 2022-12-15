@@ -82,12 +82,12 @@ class Wenku8api:
         user_info = BeautifulSoup(requests.get("https://www.wenku8.net/userdetail.php",
                                                cookies=self.cookies, headers=FAKE_HEADERS).content, "lxml")
         return self.User(
-            user_id=user_info.select("#content  table")[0].contents[3].contents[3].text,
-            name=user_info.select("#content  table")[0].contents[7].contents[3].text,
-            level=user_info.select("#content  table")[0].contents[11].contents[3].text,
-            honor=user_info.select("#content  table")[0].contents[13].contents[3].text,
-            points=int(user_info.select("#content  table")[0].contents[33].contents[3].text),
-            avatar_url=user_info.select("#content  table")[0].contents[3].contents[5].img["src"]
+            user_id=user_info.select("html body div.main div#centerm div#content table.grid tr td.even")[0].text,
+            name=user_info.select("html body div.main div#centerm div#content table.grid tr td.even")[3].text,
+            level=user_info.select("html body div.main div#centerm div#content table.grid tr td.even")[5].text,
+            honor=user_info.select("html body div.main div#centerm div#content table.grid tr td.even")[6].text,
+            points=int(user_info.select("html body div.main div#centerm div#content table.grid tr td.even")[15].text),
+            avatar_url=user_info.select(".avatar")[0]["src"]
         )
 
     def get_book(self, book_id) -> Book:
