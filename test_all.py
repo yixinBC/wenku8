@@ -6,15 +6,14 @@ import requests
 class ApiTestCase(unittest.TestCase):
     def __init__(self, method_name):
         super().__init__(methodName=method_name)
-        self.wenku8 = wenku8_api.Wenku8api("wenku8test", "wenku8test", 86400)
-        self.user = self.wenku8.get_user()
-        self.test_book = self.wenku8.Book("1", self.wenku8.cookies)
-        self.cookies = self.wenku8.cookies
+        self.cookies = wenku8_api._login("wenku8test", "wenku8test", usecookie=86400)
+        self.user = wenku8_api.get_user(self.cookies)
+        self.test_book = wenku8_api.get_book(self.cookies, "1")
 
     def test_wenku8_login(self):
-        self.assertEqual(requests.get("https://www.wenku8.net/index.php",
+        self.assertFalse(requests.get("https://www.wenku8.net/index.php",
                                       cookies=self.cookies,
-                                      headers=wenku8_api.FAKE_HEADERS).is_redirect, False)  # add assertion here
+                                      headers=wenku8_api.FAKE_HEADERS).is_redirect)  # add assertion here
 
     def test_user_panel(self):
         self.assertEqual(self.user.id, "1193383")
