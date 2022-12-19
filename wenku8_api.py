@@ -52,6 +52,23 @@ class Wenku8api:
             self.points = points
             self.avatar_url = avatar_url
 
+    class Author:
+        """
+        author class
+        """
+
+        def __init__(self, name: str) -> None:
+            self.name = name
+
+        @property
+        def books(self) -> list:
+            """
+            get the books of this author
+            :return: a list of books
+            """
+            # TODO: get the books of this author
+            pass
+
     class Book:
         """
         book class
@@ -68,8 +85,9 @@ class Wenku8api:
                                               "1) > span:nth-child(1) > b:nth-child(1)")[0].text
             self.cover_url = self.meta_info.select("#content > div:nth-child(1) > table:nth-child(4) > "
                                                    "tr:nth-child(1) > td:nth-child(1) > img:nth-child(1)")[0]["src"]
-            self.author = self.meta_info.select("#content > div:nth-child(1) > table:nth-child(1) > tr:nth-child(2) > "
-                                                "td:nth-child(2)")[0].text[5:]
+            self.author = Wenku8api.Author(
+                self.meta_info.select("#content > div:nth-child(1) > table:nth-child(1) > tr:nth-child(2) > "
+                                      "td:nth-child(2)")[0].text[5:])
 
     def __init__(self, username: str, password: str, usecookie: int):
         self.cookies = _login(username, password, usecookie)

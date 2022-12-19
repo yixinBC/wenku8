@@ -25,7 +25,7 @@ class ApiTestCase(unittest.TestCase):
 
     def test_book_meta(self):
         self.assertEqual(self.test_book.cover_url, "https://img.wenku8.com/image/0/1/1s.jpg")
-        self.assertEqual(self.test_book.author, "野村美月")
+        self.assertEqual(self.test_book.author.name, "野村美月")
         self.assertEqual(self.test_book.name, "文学少女")
 
 
